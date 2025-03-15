@@ -1,0 +1,48 @@
+  .login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+  
+  .login-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    transition: transform 0.2s;
+  }
+  
+  .login-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .form-label {
+    font-weight: bold;
+    color: #4caf50; /* Organic green color */
+  }
+  
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #cfd8dc;
+    transition: border-color 0.2s;
+  }
+  
+  .form-control:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+  }
+  
+  .btn-primary {
+    background-color: #4caf50; /* Organic green color */
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    transition: background-color 0.2s;
+  }
+  
+  .btn-primary:hover {
+    background-color: #43a047; /* Darker green on hover */
+  }

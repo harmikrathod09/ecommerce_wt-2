@@ -1,0 +1,255 @@
+<===========================================Category Data===========================================>
+
+
+[{
+  "_id": {
+    "$oid": "67c462190b9dfa8816202c62"
+  },
+  "CategoryImage": "CategoryImage-1740923417397-372171919.png",
+  "CategoryName": "Clothing",
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c4624d0b9dfa8816202c64"
+  },
+  "CategoryImage": "CategoryImage-1740923469224-281578209.png",
+  "CategoryName": "Electronics",
+  "__v": 0
+}]
+
+
+<===========================================Product Data===========================================>
+
+
+[{
+  "_id": {
+    "$oid": "67c46371ed1b179b729d1b09"
+  },
+  "ProductImage": "ProductImage-1740923761167-602792763.jpg",
+  "ProductName": "T-Shirt",
+  "ProductDescription": "A comfortable cotton t-shirt.",
+  "ProductPrice": 20,
+  "ProductQuantity": 200,
+  "ProductDiscount": 5,
+  "ProductPurchaseCount": 300,
+  "CategoryID": {
+    "$oid": "67c462190b9dfa8816202c62"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c463dfed1b179b729d1b0b"
+  },
+  "ProductImage": "ProductImage-1740923871085-699908817.png",
+  "ProductName": "Laptop",
+  "ProductDescription": "A high-performance laptop.",
+  "ProductPrice": 1000,
+  "ProductQuantity": 50,
+  "ProductDiscount": 10,
+  "ProductPurchaseCount": 150,
+  "CategoryID": {
+    "$oid": "67c4624d0b9dfa8816202c64"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c48da99322b7b744fc9358"
+  },
+  "ProductImage": "ProductImage-1740934569566-291812276.png",
+  "ProductName": "Smartphone",
+  "ProductDescription": "A feature-packed smartphone with a great camera.",
+  "ProductPrice": 700,
+  "ProductQuantity": 80,
+  "ProductDiscount": 15,
+  "ProductPurchaseCount": 250,
+  "CategoryID": {
+    "$oid": "67c4624d0b9dfa8816202c64"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c48de19322b7b744fc935b"
+  },
+  "ProductImage": "ProductImage-1740934625375-829808996.png",
+  "ProductName": "Bluetooth Headphones",
+  "ProductDescription": "Noise-canceling over-ear Bluetooth headphones.",
+  "ProductPrice": 150,
+  "ProductQuantity": 120,
+  "ProductDiscount": 10,
+  "ProductPurchaseCount": 180,
+  "CategoryID": {
+    "$oid": "67c4624d0b9dfa8816202c64"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c48e069322b7b744fc935d"
+  },
+  "ProductImage": "ProductImage-1740934662397-913328941.png",
+  "ProductName": "Smartwatch",
+  "ProductDescription": "A smartwatch with fitness tracking features and notifications.",
+  "ProductPrice": 200,
+  "ProductQuantity": 70,
+  "ProductDiscount": 20,
+  "ProductPurchaseCount": 150,
+  "CategoryID": {
+    "$oid": "67c4624d0b9dfa8816202c64"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c48e2e9322b7b744fc935f"
+  },
+  "ProductImage": "ProductImage-1740934702051-415017526.png",
+  "ProductName": "Tablet",
+  "ProductDescription": "A lightweight tablet perfect for media consumption and work.",
+  "ProductPrice": 400,
+  "ProductQuantity": 60,
+  "ProductDiscount": 5,
+  "ProductPurchaseCount": 100,
+  "CategoryID": {
+    "$oid": "67c4624d0b9dfa8816202c64"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c48e689322b7b744fc9361"
+  },
+  "ProductImage": "ProductImage-1740934760832-110640719.png",
+  "ProductName": "Jeans",
+  "ProductDescription": "Classic blue denim jeans, available in multiple sizes.",
+  "ProductPrice": 40,
+  "ProductQuantity": 100,
+  "ProductDiscount": 10,
+  "ProductPurchaseCount": 350,
+  "CategoryID": {
+    "$oid": "67c462190b9dfa8816202c62"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c48e8a9322b7b744fc9363"
+  },
+  "ProductImage": "ProductImage-1740934794713-268697285.png",
+  "ProductName": "Jacket",
+  "ProductDescription": "Stylish leather jacket, perfect for cool weather.",
+  "ProductPrice": 80,
+  "ProductQuantity": 60,
+  "ProductDiscount": 15,
+  "ProductPurchaseCount": 200,
+  "CategoryID": {
+    "$oid": "67c462190b9dfa8816202c62"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c48ea99322b7b744fc9365"
+  },
+  "ProductImage": "ProductImage-1740934825464-680116887.png",
+  "ProductName": "Sweater",
+  "ProductDescription": "Warm and cozy wool sweater in various colors.",
+  "ProductPrice": 50,
+  "ProductQuantity": 120,
+  "ProductDiscount": 20,
+  "ProductPurchaseCount": 250,
+  "CategoryID": {
+    "$oid": "67c462190b9dfa8816202c62"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67c48ec59322b7b744fc9367"
+  },
+  "ProductImage": "ProductImage-1740934853137-562497782.png",
+  "ProductName": "Sneakers",
+  "ProductDescription": "Warm and cozy wool sweater in various colors.",
+  "ProductPrice": 65,
+  "ProductQuantity": 90,
+  "ProductDiscount": 10,
+  "ProductPurchaseCount": 180,
+  "CategoryID": {
+    "$oid": "67c462190b9dfa8816202c62"
+  },
+  "__v": 0
+}]
+
+
+<===========================================User Data===========================================>
+
+
+{
+  "_id": {
+    "$oid": "67d18ff9e9285bd8ca03454e"
+  },
+  "UserProfileImage": "UserProfileImage-1741787129819-539354789.png",
+  "UserName": "Ida Gaurav",
+  "UserEmail": "idagaurav421@gmail.com",
+  "UserPassword": "123456",
+  "UserContact": 1234567980,
+  "UserAddress": "abc Xyz road",
+  "UserCity": "Rajkot",
+  "UserState": "Gujarat",
+  "UserCountry": "India",
+  "UserPincode": 360002,
+  "__v": 0
+}
+
+
+<===========================================Remark Data===========================================>
+
+
+[{
+  "_id": {
+    "$oid": "67d19d28d0957e65de6bef49"
+  },
+  "RemarkDescription": "This is the best product",
+  "Rating": 5,
+  "UpdatedAt": "Wed Mar 12 2025 20:11:44 GMT+0530 (India Standard Time)",
+  "UserId": {
+    "$oid": "67d18ff9e9285bd8ca03454e"
+  },
+  "ProductID": {
+    "$oid": "67c48e8a9322b7b744fc9363"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67d19d72d0957e65de6bef4e"
+  },
+  "RemarkDescription": "asfddgffsd",
+  "Rating": 3,
+  "UpdatedAt": "Wed Mar 12 2025 20:12:58 GMT+0530 (India Standard Time)",
+  "UserId": {
+    "$oid": "67d18ff9e9285bd8ca03454e"
+  },
+  "ProductID": {
+    "$oid": "67c48e8a9322b7b744fc9363"
+  },
+  "__v": 0
+},
+{
+  "_id": {
+    "$oid": "67d1c2a5d0957e65de6befb0"
+  },
+  "RemarkDescription": "dfsdgf",
+  "Rating": 1,
+  "UpdatedAt": "Wed Mar 12 2025 22:51:41 GMT+0530 (India Standard Time)",
+  "UserId": {
+    "$oid": "67d18ff9e9285bd8ca03454e"
+  },
+  "ProductID": {
+    "$oid": "67c48e8a9322b7b744fc9363"
+  },
+  "__v": 0
+}]
