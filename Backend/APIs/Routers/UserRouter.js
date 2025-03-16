@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken'
 import { fileURLToPath } from 'url';
 import UserSchema from '../../Schemas/UserSchema.js';
 import fs from 'fs';
+import { log } from 'console';
 
 const router = express.Router();
 
@@ -137,27 +138,29 @@ router.get("/", async (req, res) => {
 });
 
 // Get User By ID
-router.get("/getOneAuth", authenticateToken, async (req, res) => {
-    try {
-        const userId = req.user.userId;
-        const data = await UserSchema.findOne({ _id: userId });
+// router.get("/getOneAuth", authenticateToken, async (req, res) => {
+//     try {
+//         const userId = req.user.userId;
+//         const data = await UserSchema.findOne({ _id: userId });
   
-        if (!data) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+//         if (!data) {
+//             return res.status(404).json({ message: 'User not found' });
+//         }
   
-        res.send(data);
-    } catch (error) {
-        console.error('Error fetching user:', error);
-        res.status(500).json({ message: 'Server error', error: error.message });
-    }
-});
+//         res.send(data);
+//     } catch (error) {
+//         console.error('Error fetching user:', error);
+//         res.status(500).json({ message: 'Server error', error: error.message });
+//     }
+// });
 
 
-router.get("/getOne/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
       const userId = req.params.id;
       const data = await UserSchema.findOne({ _id: userId });
+      console.log(data);
+      
 
       if (!data) {
           return res.status(404).json({ message: 'User not found' });
@@ -175,5 +178,19 @@ router.delete("/:id", async (req, res) => {
     const data = await UserSchema.deleteOne({ _id: req.params.id });
     res.send(data);
 });
+
+// router.get("/profile", authenticate, async (req, res) => {
+//   try {
+//       const userData = await UserSchema.findById(req.user._id);
+
+//       if (!userData) {
+//           return res.status(404).json({ message: "User not found." });
+//       }
+
+//       res.status(200).json(userData);
+//   } catch (error) {
+//       res.status(500).json({ message: "Failed to retrieve user data.", error: error.message });
+//   }
+// });
 
 export default router;

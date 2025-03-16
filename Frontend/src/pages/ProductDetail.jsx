@@ -4,6 +4,8 @@ import Swal from "sweetalert2"; // Import SweetAlert2
 import StarFullIcon from './../assets/star-full.svg';
 import StarHalfIcon from './../assets/star-half.svg';
 import StarEmptyIcon from './../assets/star-empty.svg';
+import {jwtDecode} from "jwt-decode";
+import AddRemarkForm from "./remarkform";
 
 const StarRating = ({ rating }) => {
   const fullStars = Math.floor(rating);
@@ -52,107 +54,61 @@ export default function ProductDetail() {
   const isLoggedIn = () => localStorage.getItem("token") || sessionStorage.getItem("token");
 
   // Function to handle Add to Cart with SweetAlert
-  const addToCart = () => {
-    const token = isLoggedIn();
 
-    if (!token) {
-      Swal.fire({
-        title: "Login Required",
-        text: "You need to log in to add items to your cart.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Go to Login",
-        cancelButtonText: "Cancel",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          sessionStorage.setItem("pendingCartItem", JSON.stringify({ productId, quantity, returnUrl: `/product/${productId}` }));
-          navigate("/login");
-        }
-      });
-      return;
-    }
 
-    fetch("http://localhost:3000/cart", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({ ProductID: productId, ProductQuantity: quantity })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
+  // Import jwt-decode
+
+  const addToCart = async () => {
+      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+      
+      if (!token) {
         Swal.fire({
-          title: "Added to Cart!",
-          text: `${productData?.ProductName} has been added to your cart.`,
-          icon: "success",
-          timer: 2000,
-          showConfirmButton: false
+          title: "Login Required",
+          text: "Please log in before adding items to your cart.",
+          icon: "warning",
+          confirmButtonText: "Go to Login"
+        }).then((result) => {
+          if (result.isConfirmed) navigate("/login");
         });
-      } else {
-        Swal.fire({
-          title: "Failed!",
-          text: "Could not add the product to your cart. Try again later.",
-          icon: "error",
-          confirmButtonText: "OK"
-        });
+        return;
       }
-    });
+      console.log(token);
+      
+  
+      const decodedPayload = jwtDecode(token);
+  
+      const response = await fetch("http://localhost:3000/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          ProductID: productData?._id,
+          ProductQuantity: quantity,
+          UserID: decodedPayload?.userId // Extracted from token
+        })
+      });
+  
+      const data = await response.json();
+      if (!response.ok) {
+        Swal.fire({
+          title: "Error!",
+          text: data.message || "Failed to add product to cart.",
+          icon: "error",
+          confirmButtonText: "Try Again"
+        });
+        return;
+      }
+  
+      Swal.fire({
+        title: "Added to Cart!",
+        text: `${productData?.ProductName} (x${quantity}) has been added successfully.`,
+        icon: "success",
+        confirmButtonText: "OK"
+      });
   };
-
-//   const addToCart = async () => {
-//     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-
-//     if (!token) {
-//         Swal.fire({
-//             title: "Login Required",
-//             text: "Please log in before adding items to your cart.",
-//             icon: "warning",
-//             confirmButtonText: "Go to Login"
-//         }).then((result) => {
-//             if (result.isConfirmed) navigate("/login");
-//         });
-//         return;
-//     }
-
-//     try {
-//         const response = await fetch("http://localhost:3000/cart", {
-//             method: "POST",
-//             headers: { 
-//                 "Content-Type": "application/json",
-//                 "Authorization": `Bearer ${token}`
-//             },
-//             body: JSON.stringify({
-//                 ProductID: productData?._id,  // ✅ Ensure this is a valid MongoDB ObjectId
-//                 quantity: 1                   // ✅ Ensure 'quantity' is provided
-//             })
-//         });
-
-//         const data = await response.json();
-//         if (!response.ok) throw new Error(data.message || "Failed to add to cart");
-
-//         Swal.fire({
-//             title: "Added to Cart!",
-//             text: `${productData?.ProductName} has been added successfully.`,
-//             icon: "success",
-//             confirmButtonText: "OK"
-//         });
-
-//     } catch (error) {
-//         console.error("Error:", error);
-//         Swal.fire({
-//             title: "Error!",
-//             text: "Failed to add product to cart. Please try again.",
-//             icon: "error",
-//             confirmButtonText: "Try Again"
-//         });
-//     }
-// };
-
-
-
-
+  
 
   // Check if there's a pending cart item after login
   useEffect(() => {
@@ -227,6 +183,10 @@ export default function ProductDetail() {
           <div ref={remarksEndRef}></div>
         </div>
       </div>
+
+      <AddRemarkForm />
     </div>
+
+  
   );
 }

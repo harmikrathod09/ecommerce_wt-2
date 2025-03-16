@@ -1,30 +1,27 @@
 // src/components/Login.js
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'; // Added for better alerts
 import './login/login.css';
 
-
-export default function Login(){
-  // Use a single state to store both username and password
+export default function Login() {
   const [data, setData] = useState({ username: "", password: "" });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [remember, setRemember] = useState(false);
   const navigate = useNavigate();
 
-  // Handle form change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData(prevData => ({ ...prevData, [name]: value }));
   };
 
-  // Handle Login
   const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Validation (basic)
     if (!data.username || !data.password) {
       setError('Username and Password are required!');
+      document.getElementById(!data.username ? 'username' : 'password').focus();
       return;
     }
 
@@ -34,22 +31,27 @@ export default function Login(){
     try {
       const response = await fetch('http://localhost:3000/user/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ UserName: data.username, UserPassword: data.password }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        remember ? localStorage.setItem('token', result.token) : sessionStorage.setItem('token', result.token) ;
+        remember ? localStorage.setItem('token', result.token) : sessionStorage.setItem('token', result.token);
+        Swal.fire({
+          title: "Login Successful",
+          text: "Welcome back to Organic!",
+          icon: "success",
+          timer: 2000,
+          showConfirmButton: false
+        });
         navigate('/');
       } else {
-        setError(result.message || 'Something went wrong');
+        setError(result.message || 'Invalid username or password');
       }
     } catch (err) {
-      setError('Error while communicating with the server');
+      setError('Error connecting to the server. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -85,7 +87,6 @@ export default function Login(){
               required
             />
           </div>
-          
 
           {error && <div className="alert alert-danger">{error}</div>}
 
@@ -96,7 +97,7 @@ export default function Login(){
               id="rememberMe"
               name="rememberMe"
               checked={remember}
-              onChange={()=>setRemember(!remember)}
+              onChange={() => setRemember(!remember)}
             />
             <label className="form-check-label" htmlFor="rememberMe">Remember Me</label>
           </div>

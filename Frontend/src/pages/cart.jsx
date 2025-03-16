@@ -4,34 +4,46 @@ import Swal from "sweetalert2";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Fetch Cart Items
+  // ✅ Fetch Cart Items
   useEffect(() => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    console.log(token);
+
     if (!token) {
-      Swal.fire("Login Required", "Please log in to view your cart.", "warning");
-      navigate("/login");
+      Swal.fire({
+        title: "Login Required",
+        text: "Please log in to view your cart.",
+        icon: "warning",
+        confirmButtonText: "Go to Login"
+      }).then(() => navigate("/login"));
       return;
     }
 
     fetch("http://localhost:3000/cart", {
-      headers: { "Authorization": `Bearer ${token}` }
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
     })
       .then(res => res.json())
       .then(data => {
-        console.log("Cart Data:", data);
-        setCartItems(data);
+        console.log("API Response:", data); // ✅ Inspect API response
+        setCartItems(Array.isArray(data) ? data : []); // ✅ Ensures data is an array
       })
-      .catch(error => console.error("Error fetching cart:", error));
-  }, [navigate]);
+      .catch(() => Swal.fire("Error", "Failed to load cart items.", "error"))
+      .finally(() => setIsLoading(false));
+  }, []);
 
-  // Update Quantity
+  // ✅ Update Quantity
   const updateQuantity = (cartItemId, newQuantity) => {
     if (newQuantity < 1) return;
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
-    fetch(`http://localhost:3000/cart/${cartItemId}`, {
+    fetch(`http://localhost:3000/cart/item/${cartItemId}`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -44,10 +56,11 @@ export default function CartPage() {
         setCartItems(cartItems.map(item =>
           item._id === cartItemId ? { ...item, ProductQuantity: newQuantity } : item
         ));
-      });
+      })
+      .catch(() => Swal.fire("Error", "Failed to update quantity.", "error"));
   };
 
-  // Remove Item
+  // ✅ Remove Item
   const removeItem = (cartItemId) => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
@@ -60,22 +73,36 @@ export default function CartPage() {
       cancelButtonText: "Cancel"
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://localhost:3000/cart/${cartItemId}`, {
+        fetch(`http://localhost:3000/cart/item/${cartItemId}`, {
           method: "DELETE",
           headers: { "Authorization": `Bearer ${token}` }
         })
-          .then(() => {
+          .then((res) => {
+            if (!res.ok) {
+              return res.json().then(err => { throw new Error(err.error || "Failed to remove item."); });
+            }
             setCartItems(cartItems.filter(item => item._id !== cartItemId));
             Swal.fire("Removed!", "Item has been removed from cart.", "success");
-          });
+          })
+          .catch(() => Swal.fire("Error", "Failed to remove item.", "error"));
       }
     });
   };
 
-  // Calculate Total Price
+
+  // ✅ Calculate Total Price
   const totalPrice = cartItems.reduce((sum, item) =>
     sum + item.ProductQuantity * (item.ProductID?.ProductPrice || 0), 0
   );
+
+  // ✅ Loading State
+  if (isLoading) {
+    return (
+      <div className="container mt-5 text-center">
+        <h4>Loading Cart...</h4>
+      </div>
+    );
+  }
 
   return (
     <div className="container mt-5">
@@ -100,21 +127,15 @@ export default function CartPage() {
             <tbody>
               {cartItems.map((item) => (
                 <tr key={item._id}>
-                  <td className="d-flex align-items-center">
-                    <img src={`http://localhost:3000/${item.ProductID?.ProductImage || "default.jpg"}`} 
-                         alt={item.ProductID?.ProductName || "Unknown"} 
-                         width={70} height={70} className="me-3 rounded" />
-                    {item.ProductID?.ProductName || "Unknown"}
+
+                  <td className="cursor-pointer"
+                    style={{ cursor: "pointer" }}   onClick={() => navigate(`/product/${item.ProductID?._id}`)}
+>
+                    {item.ProductID?.ProductName}
                   </td>
                   <td>₹{(item.ProductID?.ProductPrice || 0).toFixed(2)}</td>
                   <td>
-                    <input 
-                      type="number" 
-                      value={item.ProductQuantity} 
-                      min="1"
-                      className="form-control w-50 mx-auto"
-                      onChange={(e) => updateQuantity(item._id, parseInt(e.target.value))}
-                    />
+                    {item.ProductQuantity}
                   </td>
                   <td>₹{(item.ProductQuantity * (item.ProductID?.ProductPrice || 0)).toFixed(2)}</td>
                   <td>

@@ -10,6 +10,7 @@ import Registration from "./pages/Registration";
 import ProductDetail from "./pages/ProductDetail";
 import AboutUs from "./pages/aboutus/aboutus";
 import CartPage from "./pages/cart";
+import ProfilePage from "./pages/profilepage";
 
 
 function App() {
@@ -100,6 +101,7 @@ function App() {
                         <Route path="/product/:productId" element={<ProductDetail />} />
                         <Route path="/about" element={<AboutUs />} />
                         <Route path="/cart" element={<CartPage />} />
+                        <Route path="/profile" element={<ProfilePage />} />
 
                     </Route>
                 </Routes>

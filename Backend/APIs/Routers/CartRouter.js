@@ -2,33 +2,41 @@ import mongoose from 'mongoose';
 import express from 'express';
 import bodyParser from 'body-parser';
 import CartSchema from '../../Schemas/CartSchema.js';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 router.use(bodyParser.json());
 
-// ✅ Get All Cart Items (for Debugging)
 
+router.get("/", async (req, res) => {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+        if (!token) {
+            return res.status(401).json({ error: "Unauthorized. Token missing." });
+        }
 
+        const decoded = jwt.verify(token, "private");
+        const userID = decoded.userId;
 
+        const cartItems = await CartSchema.find({ UserID: userID })
+            .populate('ProductID')
+            .exec();
 
-// Add Item to Cart
-router.post("/", async (req, res) => {
-    const { ProductID, ProductQuantity, UserID } = req.body;
+        if (!cartItems || cartItems.length === 0) {
+            return res.status(404).json({ error: "No items found in cart" });
+        }
 
-    const newCartItem = new CartSchema({
-        ProductID,
-        ProductQuantity,
-        UserID
-    });
-
-    await newCartItem.save();
-    res.send("Product added to cart");
+        res.status(200).json(cartItems);
+    } catch (error) {
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
 });
+
 
 // ✅ Empty Cart (by UserID)
 router.delete("/:userId", async (req, res) => {
     try {
-        await CartSchema.deleteMany({ UserID: req.params.userId });
+        await CartSchema.deleteOne({ UserID: req.params.userId });
         res.status(200).json({ message: "Cart emptied successfully" });
     } catch (error) {
         res.status(500).json({ error: "Error emptying cart" });
