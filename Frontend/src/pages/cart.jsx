@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+// import jwtDecode from 'jwt-decode'; 
 import Swal from "sweetalert2";
 
 export default function CartPage() {
@@ -10,7 +11,6 @@ export default function CartPage() {
   // ✅ Fetch Cart Items
   useEffect(() => {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-    console.log(token);
 
     if (!token) {
       Swal.fire({
@@ -30,35 +30,21 @@ export default function CartPage() {
       }
     })
       .then(res => res.json())
-      .then(data => {
-        console.log("API Response:", data); // ✅ Inspect API response
-        setCartItems(Array.isArray(data) ? data : []); // ✅ Ensures data is an array
-      })
+      .then(data => setCartItems(Array.isArray(data) ? data : []))
       .catch(() => Swal.fire("Error", "Failed to load cart items.", "error"))
       .finally(() => setIsLoading(false));
   }, []);
 
-  // ✅ Update Quantity
-  const updateQuantity = (cartItemId, newQuantity) => {
-    if (newQuantity < 1) return;
-    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-
-    fetch(`http://localhost:3000/cart/item/${cartItemId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify({ ProductQuantity: newQuantity })
-    })
-      .then(res => res.json())
-      .then(() => {
-        setCartItems(cartItems.map(item =>
-          item._id === cartItemId ? { ...item, ProductQuantity: newQuantity } : item
-        ));
-      })
-      .catch(() => Swal.fire("Error", "Failed to update quantity.", "error"));
+  // ✅ Calculate Discounted Price
+  const calculateDiscountedPrice = (price, discount) => {
+    return price - (price * (discount || 0) / 100);
   };
+
+  // ✅ Calculate Total Price with Discounts
+  const totalPrice = cartItems.reduce((sum, item) =>
+    sum + item.ProductQuantity * calculateDiscountedPrice(item.ProductID?.ProductPrice || 0, item.ProductID?.ProductDiscount || 0),
+    0
+  );
 
   // ✅ Remove Item
   const removeItem = (cartItemId) => {
@@ -89,12 +75,6 @@ export default function CartPage() {
     });
   };
 
-
-  // ✅ Calculate Total Price
-  const totalPrice = cartItems.reduce((sum, item) =>
-    sum + item.ProductQuantity * (item.ProductID?.ProductPrice || 0), 0
-  );
-
   // ✅ Loading State
   if (isLoading) {
     return (
@@ -103,6 +83,56 @@ export default function CartPage() {
       </div>
     );
   }
+
+  
+  // const CheckoutButton = ({ cartItems, totalPrice }) => {
+  //   const handleCheckout = async () => {
+  //       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+  //       if (!token) {
+  //           Swal.fire("Login Required", "Please log in to place your order.", "warning");
+  //           return;
+  //       }
+
+  //       // Decode the token to extract the UserID
+  //       const decodedToken = jwtDecode(token);
+  //       const UserID = decodedToken?.id; // Adjust this key based on your token structure
+
+  //       const orderData = {
+  //           UserID, // Dynamically set UserID
+  //           ProductItems: cartItems.map(item => ({
+  //               ProductID: item.ProductID?._id,
+  //               ProductQuantity: item.ProductQuantity
+  //           })),
+  //           TotalAmount: totalPrice,
+  //           OrderDate: new Date().toISOString()
+  //       };
+
+  //       try {
+  //           const response = await fetch('/api/orders', {
+  //               method: 'POST',
+  //               headers: {
+  //                   "Authorization": `Bearer ${token}`,
+  //                   "Content-Type": "application/json"
+  //               },
+  //               body: JSON.stringify(orderData)
+  //           });
+
+  //           const data = await response.json();
+
+  //           if (response.ok) {
+  //               Swal.fire("Success", data.message, "success").then(() => {
+  //                   navigate('/orders');
+  //               });
+  //           } else {
+  //               Swal.fire("Error", data.error || "Failed to place order.", "error");
+  //           }
+  //       } catch (error) {
+  //           console.error("Error placing order:", error);
+  //           Swal.fire("Error", "Failed to place order.", "error");
+  //       }
+  //   };
+  // }
 
   return (
     <div className="container mt-5">
@@ -119,6 +149,8 @@ export default function CartPage() {
               <tr>
                 <th>Product</th>
                 <th>Price</th>
+                <th>Discount</th>
+                <th>Final Price</th>
                 <th>Quantity</th>
                 <th>Total</th>
                 <th>Action</th>
@@ -127,19 +159,33 @@ export default function CartPage() {
             <tbody>
               {cartItems.map((item) => (
                 <tr key={item._id}>
-
-                  <td className="cursor-pointer"
-                    style={{ cursor: "pointer" }}   onClick={() => navigate(`/product/${item.ProductID?._id}`)}
->
+                  <td
+                    className="cursor-pointer"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => navigate(`/product/${item.ProductID?._id}`)}
+                  >
                     {item.ProductID?.ProductName}
                   </td>
-                  <td>₹{(item.ProductID?.ProductPrice || 0).toFixed(2)}</td>
                   <td>
-                    {item.ProductQuantity}
+                    ₹{(item.ProductID?.ProductPrice || 0).toFixed(2)}
                   </td>
-                  <td>₹{(item.ProductQuantity * (item.ProductID?.ProductPrice || 0)).toFixed(2)}</td>
                   <td>
-                    <button className="btn btn-danger btn-sm" onClick={() => removeItem(item._id)}>❌ Remove</button>
+                    {item.ProductID?.ProductDiscount || 0}%
+                  </td>
+                  <td>
+                    ₹{calculateDiscountedPrice(item.ProductID?.ProductPrice || 0, item.ProductID?.ProductDiscount || 0).toFixed(2)}
+                  </td>
+                  <td>{item.ProductQuantity}</td>
+                  <td>
+                    ₹{(item.ProductQuantity * calculateDiscountedPrice(item.ProductID?.ProductPrice || 0, item.ProductID?.ProductDiscount || 0)).toFixed(2)}
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => removeItem(item._id)}
+                    >
+                      ❌ Remove
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -148,10 +194,12 @@ export default function CartPage() {
 
           <div className="d-flex justify-content-between align-items-center mt-4">
             <h4>Total Price: ₹{totalPrice.toFixed(2)}</h4>
-            <button className="btn btn-success">Proceed to Checkout</button>
+            <button className="btn btn-success" >
+            Proceed to Checkout
+        </button>
           </div>
         </>
       )}
     </div>
   );
-}
+  }

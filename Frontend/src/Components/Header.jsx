@@ -72,7 +72,7 @@ export default function Header() {
                     <div className="col-lg-4">
                         <ul className="navbar-nav list-unstyled d-flex flex-row gap-3 gap-lg-5 justify-content-center flex-wrap align-items-center mb-0 fw-bold text-uppercase text-dark">
                             <li className="nav-item"><Link className="nav-link" to="/">Home</Link></li>
-                            <li className="nav-item"><Link className="nav-link" to="/category">Category</Link></li>
+                            <li className="nav-item"><Link className="nav-link" to="/order">Order</Link></li>
                             <li className="nav-item"><Link className="nav-link" to="/cart">Cart</Link></li>
                             <li className="nav-item"><Link className="nav-link" to="/about">About Us</Link></li>
                         </ul>

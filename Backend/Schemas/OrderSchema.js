@@ -12,8 +12,14 @@ const orderSchema = mongoose.Schema({
         },
         ProductQuantity: Number
     }],
-    TotalAmount: Number,
-    OrderDate: Date
+    TotalAmount: {
+        type: Number,
+        required: true
+    },
+    OrderDate: {
+        type: Date,
+        default: Date.now
+    }
 });
 
 export default mongoose.model('orders', orderSchema);

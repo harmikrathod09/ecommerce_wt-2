@@ -4,7 +4,7 @@ import Swal from "sweetalert2"; // Import SweetAlert2
 import StarFullIcon from './../assets/star-full.svg';
 import StarHalfIcon from './../assets/star-half.svg';
 import StarEmptyIcon from './../assets/star-empty.svg';
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import AddRemarkForm from "./remarkform";
 
 const StarRating = ({ rating }) => {
@@ -59,56 +59,56 @@ export default function ProductDetail() {
   // Import jwt-decode
 
   const addToCart = async () => {
-      const token = localStorage.getItem("token") || sessionStorage.getItem("token");
-      
-      if (!token) {
-        Swal.fire({
-          title: "Login Required",
-          text: "Please log in before adding items to your cart.",
-          icon: "warning",
-          confirmButtonText: "Go to Login"
-        }).then((result) => {
-          if (result.isConfirmed) navigate("/login");
-        });
-        return;
-      }
-      console.log(token);
-      
-  
-      const decodedPayload = jwtDecode(token);
-  
-      const response = await fetch("http://localhost:3000/cart", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          ProductID: productData?._id,
-          ProductQuantity: quantity,
-          UserID: decodedPayload?.userId // Extracted from token
-        })
-      });
-  
-      const data = await response.json();
-      if (!response.ok) {
-        Swal.fire({
-          title: "Error!",
-          text: data.message || "Failed to add product to cart.",
-          icon: "error",
-          confirmButtonText: "Try Again"
-        });
-        return;
-      }
-  
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+
+    if (!token) {
       Swal.fire({
-        title: "Added to Cart!",
-        text: `${productData?.ProductName} (x${quantity}) has been added successfully.`,
-        icon: "success",
-        confirmButtonText: "OK"
+        title: "Login Required",
+        text: "Please log in before adding items to your cart.",
+        icon: "warning",
+        confirmButtonText: "Go to Login"
+      }).then((result) => {
+        if (result.isConfirmed) navigate("/login");
       });
+      return;
+    }
+    console.log(token);
+
+
+    const decodedPayload = jwtDecode(token);
+
+    const response = await fetch("http://localhost:3000/cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        ProductID: productData?._id,
+        ProductQuantity: quantity,
+        UserID: decodedPayload?.userId // Extracted from token
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      Swal.fire({
+        title: "Error!",
+        text: data.message || "Failed to add product to cart.",
+        icon: "error",
+        confirmButtonText: "Try Again"
+      });
+      return;
+    }
+
+    Swal.fire({
+      title: "Added to Cart!",
+      text: `${productData?.ProductName} (x${quantity}) has been added successfully.`,
+      icon: "success",
+      confirmButtonText: "OK"
+    });
   };
-  
+
 
   // Check if there's a pending cart item after login
   useEffect(() => {
@@ -125,6 +125,61 @@ export default function ProductDetail() {
   if (!productData) {
     return <div className="container mt-5 text-center"><h4>Loading Product...</h4></div>;
   }
+
+  const placeOrder = async () => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+    if (!token) {
+        Swal.fire({
+            title: "Login Required",
+            text: "Please log in before placing an order.",
+            icon: "warning",
+            confirmButtonText: "Go to Login"
+        }).then((result) => {
+            if (result.isConfirmed) navigate("/login");
+        });
+        return;
+    }
+
+    const decodedPayload = jwtDecode(token);
+
+    const orderData = {
+        UserID: decodedPayload?.userId,
+        ProductItems: [{
+            ProductID: productData?._id,
+            ProductQuantity: quantity
+        }],
+        TotalAmount: (productData?.ProductPrice - (productData?.ProductPrice * (productData?.ProductDiscount / 100))) * quantity,
+        OrderDate: new Date()
+    };
+
+    const response = await fetch("http://localhost:3000/order", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        Swal.fire({
+            title: "Order Failed!",
+            text: data.message || "Failed to place order.",
+            icon: "error",
+            confirmButtonText: "Try Again"
+        });
+        return;
+    }
+
+    Swal.fire({
+        title: "Order Placed!",
+        text: `Your order for ${productData?.ProductName} (x${quantity}) has been placed successfully.`,
+        icon: "success",
+        confirmButtonText: "OK"
+    });
+};
+
 
   return (
     <div className="container mt-5">
@@ -166,6 +221,10 @@ export default function ProductDetail() {
             <button className="btn btn-primary rounded-3 px-4 shadow-sm fw-semibold" onClick={addToCart}>
               🛒 Add to Cart
             </button>
+            <button className="btn btn-success rounded-3 px-4 shadow-sm fw-semibold" onClick={placeOrder}>
+              📦 Place Order
+            </button>
+
           </div>
         </div>
       </div>
@@ -184,9 +243,9 @@ export default function ProductDetail() {
         </div>
       </div>
 
-      <AddRemarkForm />
+      <AddRemarkForm productId={productId} />
     </div>
 
-  
+
   );
 }

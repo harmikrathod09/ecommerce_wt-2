@@ -11,6 +11,7 @@ import ProductDetail from "./pages/ProductDetail";
 import AboutUs from "./pages/aboutus/aboutus";
 import CartPage from "./pages/cart";
 import ProfilePage from "./pages/profilepage";
+import OrderPage from "./pages/order";
 
 
 function App() {
@@ -102,6 +103,8 @@ function App() {
                         <Route path="/about" element={<AboutUs />} />
                         <Route path="/cart" element={<CartPage />} />
                         <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/order" element={<OrderPage />} />
+
 
                     </Route>
                 </Routes>

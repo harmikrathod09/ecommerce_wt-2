@@ -12,37 +12,45 @@ router.get("/", async (req, res) => {
     res.send(orders);
 });
 
-// 2. Get Order by ID
-router.get("/:id", async (req, res) => {
-    const { id } = req.params;
-    const order = await OrderSchema.findById(id);
+// 2. Get Order by User ID
+router.get("/user/:userId", async (req, res) => {
+    const { userId } = req.params;
 
-    if (!order) {
-        return res.send("Order not found");
+    try {
+        const orders = await OrderSchema.find({ UserID: userId }).populate("ProductItems.ProductID");
+        if (!orders || orders.length === 0) {
+            return res.status(404).json([]);
+        }
+        res.status(200).json(orders);  
+    } catch (error) {
+        res.status(500).json([]);
     }
-    res.send(order);
 });
 
 // 3. Create New Order
 router.post("/", async (req, res) => {
-    const { UserID, ProductItems, TotalAmount, OrderDate } = req.body;
+    try {
+        const { UserID, ProductItems, TotalAmount, OrderDate } = req.body;
 
-    const newOrder = new OrderSchema({
-        UserID,
-        ProductItems,
-        TotalAmount,
-        OrderDate
-    });
+        const newOrder = new OrderSchema({
+            UserID,
+            ProductItems,
+            TotalAmount,
+            OrderDate
+        });
 
-    await newOrder.save();
-    res.send({ message: "Order created successfully", order: newOrder });
+        await newOrder.save();
+        res.status(201).json({ message: "Order created successfully", order: newOrder });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to create order", details: error.message });
+    }
 });
 
-// 5. Delete Order by ID
+// 4. Delete Order by ID
 router.delete("/:id", async (req, res) => {
     const { id } = req.params;
     const order = await OrderSchema.findByIdAndDelete(id);
-    
+
     if (!order) {
         return res.send("Order not found");
     }
