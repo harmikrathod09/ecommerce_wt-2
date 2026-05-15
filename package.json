@@ -3,7 +3,7 @@
   "proxy": "http://localhost:3000",
   "scripts": {
     "start": "concurrently \"npm run server\" \"npm run client\"",
-    "server": "node Backend/APIs/MainAPI.js",
+    "server": "node Backend/APIs/Server.js",
     "client": "cd Frontend && npm run dev"
   },
   "dependencies": {

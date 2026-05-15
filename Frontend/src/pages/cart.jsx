@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import jwtDecode from 'jwt-decode'; 
+import { jwtDecode } from 'jwt-decode'; 
 import Swal from "sweetalert2";
 
 export default function CartPage() {
@@ -85,54 +85,58 @@ export default function CartPage() {
   }
 
   
-  // const CheckoutButton = ({ cartItems, totalPrice }) => {
-  //   const handleCheckout = async () => {
-  //       const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  const handleCheckout = async () => {
+    const token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
-  //       if (!token) {
-  //           Swal.fire("Login Required", "Please log in to place your order.", "warning");
-  //           return;
-  //       }
+    if (!token) {
+      Swal.fire("Login Required", "Please log in to place your order.", "warning");
+      return;
+    }
 
-  //       // Decode the token to extract the UserID
-  //       const decodedToken = jwtDecode(token);
-  //       const UserID = decodedToken?.id; // Adjust this key based on your token structure
+    // Decode the token to extract the UserID
+    const decodedToken = jwtDecode(token);
+    const UserID = decodedToken?.userId;
 
-  //       const orderData = {
-  //           UserID, // Dynamically set UserID
-  //           ProductItems: cartItems.map(item => ({
-  //               ProductID: item.ProductID?._id,
-  //               ProductQuantity: item.ProductQuantity
-  //           })),
-  //           TotalAmount: totalPrice,
-  //           OrderDate: new Date().toISOString()
-  //       };
+    const orderData = {
+      UserID,
+      ProductItems: cartItems.map(item => ({
+        ProductID: item.ProductID?._id,
+        ProductQuantity: item.ProductQuantity
+      })),
+      TotalAmount: totalPrice,
+      OrderDate: new Date().toISOString()
+    };
 
-  //       try {
-  //           const response = await fetch('/api/orders', {
-  //               method: 'POST',
-  //               headers: {
-  //                   "Authorization": `Bearer ${token}`,
-  //                   "Content-Type": "application/json"
-  //               },
-  //               body: JSON.stringify(orderData)
-  //           });
+    try {
+      const response = await fetch('http://localhost:3000/order', {
+        method: 'POST',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orderData)
+      });
 
-  //           const data = await response.json();
+      const data = await response.json();
 
-  //           if (response.ok) {
-  //               Swal.fire("Success", data.message, "success").then(() => {
-  //                   navigate('/orders');
-  //               });
-  //           } else {
-  //               Swal.fire("Error", data.error || "Failed to place order.", "error");
-  //           }
-  //       } catch (error) {
-  //           console.error("Error placing order:", error);
-  //           Swal.fire("Error", "Failed to place order.", "error");
-  //       }
-  //   };
-  // }
+      if (response.ok) {
+        // Clear the cart after successful order
+        await fetch(`http://localhost:3000/cart/${UserID}`, {
+          method: "DELETE",
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        Swal.fire("Order Placed!", "Your order has been placed successfully.", "success").then(() => {
+          navigate('/order');
+        });
+      } else {
+        Swal.fire("Error", data.error || "Failed to place order.", "error");
+      }
+    } catch (error) {
+      console.error("Error placing order:", error);
+      Swal.fire("Error", "Failed to place order.", "error");
+    }
+  };
 
   return (
     <div className="container mt-5">
@@ -194,9 +198,9 @@ export default function CartPage() {
 
           <div className="d-flex justify-content-between align-items-center mt-4">
             <h4>Total Price: ₹{totalPrice.toFixed(2)}</h4>
-            <button className="btn btn-success" >
-            Proceed to Checkout
-        </button>
+            <button className="btn btn-success" onClick={handleCheckout}>
+              Proceed to Checkout
+            </button>
           </div>
         </>
       )}

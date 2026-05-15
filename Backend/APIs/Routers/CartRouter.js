@@ -43,21 +43,36 @@ router.delete("/:userId", async (req, res) => {
     }
 });
 
-// ✅ Add Item to Cart
+// ✅ Add Item to Cart (or update quantity if exists)
 router.post("/", async (req, res) => {
     try {
         const { ProductID, ProductQuantity, UserID } = req.body;
 
-        const newCartItem = new CartSchema({
-            ProductID,
-            ProductQuantity,
-            UserID
-        });
+        if (!ProductID || !UserID) {
+            return res.status(400).json({ error: "ProductID and UserID are required" });
+        }
 
-        await newCartItem.save();
-        res.status(201).json({ message: "Product added to cart", newCartItem });
+        // Check if the product is already in the cart for this user
+        let cartItem = await CartSchema.findOne({ UserID, ProductID });
+
+        if (cartItem) {
+            // Update existing item quantity
+            cartItem.ProductQuantity += (ProductQuantity || 1);
+            await cartItem.save();
+            return res.status(200).json({ message: "Cart updated successfully", cartItem });
+        } else {
+            // Create new cart item
+            const newCartItem = new CartSchema({
+                ProductID,
+                ProductQuantity: ProductQuantity || 1,
+                UserID
+            });
+            await newCartItem.save();
+            return res.status(201).json({ message: "Product added to cart", newCartItem });
+        }
     } catch (error) {
-        res.status(500).json({ error: "Error adding product to cart" });
+        console.error("Cart error:", error);
+        res.status(500).json({ error: "Error adding product to cart", details: error.message });
     }
 });
 

@@ -16,11 +16,11 @@ import WishlistRouter from './Routers/WishlistRouter.js'
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: ['http://localhost:5173', 'http://localhost:5174'],
 }));
 app.use(bodyParser.json());
 
-mongoose.connect('mongodb+srv://ecommerce:ecommerce123@e-commerce.jaz4g.mongodb.net/?retryWrites=true&w=majority&appName=e-commerce').then(() => {
+mongoose.connect('mongodb://ecommerce:ecommerce123@e-commerce-shard-00-00.jaz4g.mongodb.net:27017,e-commerce-shard-00-01.jaz4g.mongodb.net:27017,e-commerce-shard-00-02.jaz4g.mongodb.net:27017/?authSource=admin&replicaSet=atlas-4klo11-shard-0&tls=true').then(() => {
     console.log("Database Connected");
     
 
