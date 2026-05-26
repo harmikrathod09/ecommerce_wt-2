@@ -137,22 +137,22 @@ router.get("/", async (req, res) => {
     res.send(data);
 });
 
-// Get User By ID
-// router.get("/getOneAuth", authenticateToken, async (req, res) => {
-//     try {
-//         const userId = req.user.userId;
-//         const data = await UserSchema.findOne({ _id: userId });
+// Get User By ID (Authenticated)
+router.get("/getOneAuth", authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const data = await UserSchema.findOne({ _id: userId });
   
-//         if (!data) {
-//             return res.status(404).json({ message: 'User not found' });
-//         }
+        if (!data) {
+            return res.status(404).json({ message: 'User not found' });
+        }
   
-//         res.send(data);
-//     } catch (error) {
-//         console.error('Error fetching user:', error);
-//         res.status(500).json({ message: 'Server error', error: error.message });
-//     }
-// });
+        res.send(data);
+    } catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
 
 
 router.get("/:id", async (req, res) => {
